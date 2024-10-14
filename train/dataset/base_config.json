@@ -1,0 +1,13 @@
+{
+    "OPTIMIZATION_BUDGET": 10000,
+    "REPEAT_BENCHMARK": 4,
+    "FLA_PARAMS": {
+        "random_sample_N": 500,
+        "jensens_inequality_N": 150,
+        "FEM_params": {
+            "random_walk_len": 150,
+            "epsilon": [0.001, 0.005, 0.01, 0.02, 0.03, 0.04],
+            "step_size": 0.007
+        }
+    }
+}

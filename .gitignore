@@ -1,0 +1,3 @@
+**/__pycache__/
+train/dataset/*
+!train/dataset/base_config.json
