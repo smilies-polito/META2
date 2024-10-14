@@ -1,0 +1,1 @@
+singularity build --fakeroot --sandbox ../opt_metamodel singularity.def
