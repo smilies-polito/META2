@@ -1,0 +1,5 @@
+2024-10-14 16:33:47,935 - pygad.pygad - ERROR - Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but (0.2) of type <class 'float'> found.
+Traceback (most recent call last):
+  File "/home/ldapusers/masera/.local/lib/python3.10/site-packages/pygad/pygad.py", line 709, in __init__
+    raise TypeError(f"Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
+TypeError: Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but (0.2) of type <class 'float'> found.

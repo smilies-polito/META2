@@ -14,5 +14,5 @@ From: ubuntu
     apt -y install python3-setuptools
     apt install -y r-base
     apt install -y libcurl4-gnutls-dev libxml2-dev libssl-dev
+    python3 -m pip install --upgrade pip setuptools wheel
     pip install -r requirements.txt 
-    

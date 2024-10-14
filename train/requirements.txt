@@ -1,3 +1,5 @@
+rpy2
+pyswarms
 matplotlib==3.8.0
 noise==1.2.2
 numpy==1.26.0
@@ -5,5 +7,3 @@ pygad==3.3.1
 scipy
 beecolpy
 scikit-learn
-rpy2
-pyswarms

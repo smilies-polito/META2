@@ -10,8 +10,7 @@ class GA(BaseSolver):
         return f"ga-ps_{self.parent_selection_type}-cr_{self.crossover_type}-mp_{self.mutation_p}-mt_{self.mutation_type}"
         
     def __init__(self, problem: BaseProblem, budget=10000,
-        parent_selection_type="sss", cr_type="single_point", mutation_p=0.1, pop_size=32, p_mating=6, mutation_type="random"
-        IGNORE_DISCRETE=False):
+        parent_selection_type="sss", cr_type="single_point", mutation_p=0.1, pop_size=32, p_mating=6, mutation_type="random",):
         
         self.problem = problem
         self.budget = budget
@@ -19,8 +18,8 @@ class GA(BaseSolver):
         #Hyperparameters
         assert parent_selection_type in ["sss", "rws", "rank"]
         assert mutation_p >= 0 and mutation_p <= 1
-        assert crossover_type in ["single_point","uniform","scattered"]
-        assert mutation_type in ["random", "adaptive", "scramble"]
+        assert cr_type in ["single_point","uniform","scattered"]
+        assert mutation_type in ["random", "scramble"]
         self.parent_selection_type = parent_selection_type
         self.mutation_p = mutation_p
         self.crossover_type = cr_type
@@ -28,8 +27,7 @@ class GA(BaseSolver):
         self.p_mating = p_mating
         self.mutation_type = mutation_type
 
-        self.IGNORE_DISCRETE = IGNORE_DISCRETE
-        self.num_generations = int(budget/POP_SIZE)
+        self.num_generations = int(budget/pop_size)
         
     def solve(self):
         init_range_low = [r[0] for r in self.problem.get_ranges()]
@@ -38,10 +36,7 @@ class GA(BaseSolver):
 
         gene_space = []
         for i in range(self.problem.get_dimensions()):
-            if (self.IGNORE_DISCRETE==False and self.problem.get_continuous()[i] == False):
-                gene_space.append([j for j in range(self.problem.get_ranges()[i][0], self.problem.get_ranges()[i][1]+1)])
-            else:
-                gene_space.append({'low': init_range_low[i], 'high':init_range_high[i]})
+            gene_space.append({'low': init_range_low[i], 'high':init_range_high[i]})
 
         self.ga_instance = pygad.GA(num_generations=self.num_generations,
                         num_parents_mating=self.p_mating,
@@ -66,11 +61,10 @@ class GA(BaseSolver):
         for mutation in [0.1, 0.2]:
             variants += [
                 lambda p, b: GA(p, b, mutation_p=mutation),
-                lambda p, b: GA(p, b, mutation_p=mutation, crossover_type="uniform"),
-                lambda p, b: GA(p, b, mutation_p=mutation, crossover_type="scattered"),
+                lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform"),
+                lambda p, b: GA(p, b, mutation_p=mutation, cr_type="scattered"),
                 lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rws"),
                 lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rank"),
-                lambda p, b: GA(p, b, mutation_p=mutation, mutation_type="adaptive"),
                 lambda p, b: GA(p, b, mutation_p=mutation, mutation_type="scramble"),
             ]
         return variants

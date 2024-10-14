@@ -10,7 +10,7 @@ class DE(BaseSolver):
     def __init__(self, problem: BaseProblem, budget=10000, strategy='best1bin'):
         self.problem = problem
         self.bounds = [(r[0], r[1]) for r in problem.get_ranges()]
-        assert strategy in ['rand1bin', 'best1exp', 'currenttobest1bin','randtobest1bin','randtobest1exp','best2exp']
+        assert strategy in ['best1bin','rand1bin', 'best1exp', 'currenttobest1bin','randtobest1bin','randtobest1exp','best2exp']
         self.strategy = strategy
         self.budget = budget
         

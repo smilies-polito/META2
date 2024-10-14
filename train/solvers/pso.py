@@ -9,7 +9,7 @@ class PSO(BaseSolver):
         return f"pso-particles_{self.n_particles}-c1_{self.cognitive_coefficient}-c2_{self.social_coefficient}-w_{self.intertia}"
         
     def __init__(self, problem: BaseProblem, budget=10000, 
-        n_particles=10, cognitive_coefficient=0.5, social_coefficient=0.3, intertia=0.9
+        n_particles=10, cognitive_coefficient=0.5, social_coefficient=0.3, intertia=0.9,
         initial_solution=None):
         self.problem = problem
         self.bounds = (np.array([r[0] for r in problem.get_ranges()]), np.array([r[1] for r in problem.get_ranges()]))

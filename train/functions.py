@@ -65,10 +65,11 @@ def get_split_functions():
 #Perform data augmentation
 def augment_functions(functions):
     functions = [Random_transform(problem, 0.3) for problem in functions*2]
-    for _ in range(len(function)*8):
+    N = len(functions)*8
+    for i in range(N):
         f1, f2 = random.choice(functions), random.choice(functions)
         functions.append(Summed_problems(f1, f2, weight_1=random.random()*0.7+0.15))
         f1, f2 = random.choice(functions), random.choice(functions)
-        functions.append(Multiplied_problems(f1, f2, weight_1=random.random()))
+        functions.append(Multiplied_problems(f1, f2))
     return functions
 

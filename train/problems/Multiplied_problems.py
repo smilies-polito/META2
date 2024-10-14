@@ -49,6 +49,6 @@ class Multiplied_problems(BaseProblem):
         else:
             point1 = point 
             point2 = linear_transform(point,self.dimensions_tr,  self.starting_point, self.range_old, self.range_new, self.starting_point_new)
-        p1_contribution = self.problem1.get_value(point1) - self.fitness_ranges_1[1]
-        p2_contribution = self.problem2.get_value(point2) - self.fitness_ranges_2[1]
+        p1_contribution = (self.problem1.get_value(point1) - self.fitness_ranges_1[1])/self.fitness_ranges_1[0]
+        p2_contribution = (self.problem2.get_value(point2) - self.fitness_ranges_2[1])/self.fitness_ranges_2[0]
         return p1_contribution * p2_contribution

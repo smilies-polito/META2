@@ -12,7 +12,6 @@ class ABC(BaseSolver):
         self.problem = problem
         self.bounds = [(r[0], r[1]) for r in problem.get_ranges()]
         self.budget = budget
-        self.reset()
         
     def solve(self):
         fitness_function = lambda solution: self.problem.get_value(np.array(solution))
