@@ -3,3 +3,81 @@ Traceback (most recent call last):
   File "/home/ldapusers/masera/.local/lib/python3.10/site-packages/pygad/pygad.py", line 709, in __init__
     raise TypeError(f"Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but ({mutation_probability}) of type {type(mutation_probability)} found.")
 TypeError: Unexpected type for the 'mutation_probability' parameter. When mutation_type='adaptive', then list/tuple/numpy.ndarray is expected but (0.2) of type <class 'float'> found.
+2024-10-17 12:03:45,882 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:03:46,225 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:03:47,003 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:03:47,004 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:03:47,021 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:03:47,564 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:03:52,715 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:03:52,715 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:05:11,427 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:05:11,436 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:05:11,639 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:05:11,639 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:05:11,641 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:05:11,922 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:09:13,144 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:09:13,144 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:10:16,202 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:10:16,210 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:10:16,429 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:10:16,430 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:10:16,432 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:10:16,713 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:10:19,105 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:10:19,105 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:12:14,856 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:12:14,865 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:12:15,070 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:12:15,071 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:12:15,073 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:12:15,352 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:12:17,739 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:12:17,740 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:13:11,151 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:13:11,160 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:13:11,365 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:13:11,365 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:13:11,367 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:13:11,647 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:13:14,063 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:13:14,064 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:14:19,506 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:14:19,514 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:14:19,719 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:14:19,719 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:14:19,721 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:14:20,000 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:14:20,164 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:14:20,164 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:16:03,698 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:16:03,706 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:16:03,911 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:16:03,911 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:16:03,913 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:16:04,193 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:16:59,441 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:16:59,441 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:17:02,506 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:17:02,514 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:17:02,719 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:17:02,719 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:17:02,721 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:17:03,000 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:22:25,850 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:22:25,850 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:25:55,582 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:25:55,590 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:25:55,799 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:25:55,799 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:25:55,801 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:25:56,081 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.
+2024-10-17 12:33:04,347 - rpy2.rinterface_lib.embedded - INFO - Embedded R ended.
+2024-10-17 12:33:04,348 - rpy2.rinterface_lib.embedded - INFO - Embedded R already ended.
+2024-10-17 12:54:35,354 - rpy2.situation - INFO - cffi mode is CFFI_MODE.ANY
+2024-10-17 12:54:35,383 - rpy2.situation - INFO - R home found: /usr/lib/R
+2024-10-17 12:54:35,599 - rpy2.situation - INFO - R library path: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:54:35,599 - rpy2.situation - INFO - LD_LIBRARY_PATH: /usr/lib/R/lib:/usr/lib/x86_64-linux-gnu:/usr/lib/jvm/default-java/lib/server:/.singularity.d/libs
+2024-10-17 12:54:35,601 - rpy2.rinterface_lib.embedded - INFO - Default options to initialize R: rpy2, --quiet, --no-save
+2024-10-17 12:54:35,885 - rpy2.rinterface_lib.embedded - INFO - R is already initialized. No need to initialize.

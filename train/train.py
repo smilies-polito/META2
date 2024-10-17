@@ -19,6 +19,7 @@ import numpy as np
 
 from functions import get_base_functions, get_split_functions, augment_functions
 from algorithms import get_algorithms_lambdas
+from fla.FLA import FLA
 
 DATASET_PATH = "dataset"
 #New experiment. Experiment name as argument. Copy default config is config file not existing
@@ -62,21 +63,24 @@ def solve_with_algorithm(args):
     algorithm, repeat = args
     return np.mean([algorithm.solve() for _ in range(repeat)])
 
-def build_raw_scores(functions, budget, repeat):
+def build_raw_scores(functions, budget, repeat, multi_process):
     algorithms = get_algorithms_lambdas()
     results = []
     for i, algorithm in enumerate(algorithms):
         print(f"Running algorithm {i} of {len(algorithms)}")
-        with Pool(8) as pool:
-            results.append(pool.map(solve_with_algorithm, [(algorithm(function, budget), repeat) for function in functions]))
-
+        if (multi_process > 1):
+            with Pool(multi_process) as pool:
+                results.append(pool.map(solve_with_algorithm, [(algorithm(function, budget), repeat) for function in functions]))
+        else:
+            results.append(list(map(solve_with_algorithm, [(algorithm(function, budget), repeat) for function in functions])))
+    return results
 
 def build_raw_scores_train(experiment_name):
     config = load_config(experiment_name)
     path = f"{DATASET_PATH}/{experiment_name}"
     with open(f"{path}/train_functions.pickle", "rb") as f:
         functions = pickle.load(f)
-    scores = build_raw_scores(functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"])
+    scores = build_raw_scores(functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"], config["MULTI_PROCESS"])
     with open(f"{path}/train_scores_raw.pickle", "wb") as f:
         pickle.dump(scores, f)
 
@@ -85,8 +89,8 @@ def build_raw_scores_test(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
     with open(f"{path}/test_functions.pickle", "rb") as f:
         train_functions, test_functions = pickle.load(f)
-    train_scores = build_raw_scores(train_functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"])
-    test_scores = build_raw_scores(test_functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"])
+    train_scores = build_raw_scores(train_functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"], config["MULTI_PROCESS"])
+    test_scores = build_raw_scores(test_functions, config["OPTIMIZATION_BUDGET"], config["REPEAT_BENCHMARK"], config["MULTI_PROCESS"])
     with open(f"{path}/test_scores_raw.pickle", "wb") as f:
         pickle.dump([train_scores, test_scores], f)
 
@@ -96,7 +100,7 @@ def build_scores_train(experiment_name):
     with open(f"{path}/train_scores_raw.pickle", "rb") as f:
         raw_scores = pickle.load(f)
     transformed_scores = full_comparison_oriented_scores(raw_scores)
-    with open(f"{path}/train_scores.pickle", "rb") as f:
+    with open(f"{path}/train_scores.pickle", "wb") as f:
         pickle.dump(transformed_scores, f)
 
 def build_scores_test(experiment_name):
@@ -106,15 +110,59 @@ def build_scores_test(experiment_name):
         raw_scores_train, raw_scores_test = pickle.load(f)
     transformed_scores_train = full_comparison_oriented_scores(raw_scores_train)
     transformed_scores_test = full_comparison_oriented_scores(raw_scores_test)
-    with open(f"{path}/test_scores.pickle", "rb") as f:
-        pickle.dump(transformed_scores, f)
+    with open(f"{path}/test_scores.pickle", "wb") as f:
+        pickle.dump([transformed_scores_train, transformed_scores_test], f)
 
 #Compute and export FLA measures
-def build_fla_measures_train(experiment_name):
-    pass
-def build_fla_measures_test(experiment_name):
-    pass
+def compute_FLA_measures(functions, config):
+    return [
+        FLA.get_FLA_measures(function, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
+        for function in functions
+    ]
 
+def build_fla_measures_train(experiment_name):
+    config = load_config(experiment_name)
+    path = f"{DATASET_PATH}/{experiment_name}"
+    with open(f"{path}/train_functions.pickle", "rb") as f:
+        functions = pickle.load(f)
+    fla = compute_FLA_measures(functions, config)
+    with open(f"{path}/fla.pickle", "wb") as f:
+        pickle.dump(fla, f)
+def build_fla_measures_test(experiment_name):
+    config = load_config(experiment_name)
+    path = f"{DATASET_PATH}/{experiment_name}"
+    with open(f"{path}/test_functions.pickle", "rb") as f:
+        train_functions, test_functions = pickle.load(f)
+    fla_train = compute_FLA_measures(train_functions, config)
+    fla_test = compute_FLA_measures(test_functions, config)
+    with open(f"{path}/fla_test.pickle", "wb") as f:
+        pickle.dump([fla_train, fla_test], f)
+
+
+#Training and testing of regression model(s)
+def build_dataset(scores, fla_measures):
+    #fla: [fla_measures for f in functions]
+    #scores: [[score for f in functions] for a in algorithm]
+    #Training dataset: [(FLA, scores for each algorithm) for each function]
+    x = np.array(fla_measures)
+    y = np.array([(scores[a][i] for a in range(len(scores))) for i in range(len(scores[0]))])
+    return x, y
+
+def train_and_test(experiment_name):
+    #Load FLA measures
+    with open(f"{path}/fla_test.pickle", "rb") as f:
+        fla_train, fla_test = pickle.load(f)
+    #Load scores
+    with open(f"{path}/test_scores.pickle", "rb") as f:
+        scores_train, scores_test = pickle.load(f)
+    #Build dataset
+    x_train, y_train = build_dataset(scores_train, fla_train)
+    x_test, y_test = build_dataset(scores_test, fla_test)
+
+    for model in [RandomForest_Model(max_features="sqrt"), RandomForest_Model(criterion="absolute_error"), EnsembleModel()]:
+        train_error, _ = model.train(x_train, y_train)
+        _, error = model.test(x_test, y_test)
+        print(train_error, error)
 
 
 def main():
@@ -149,6 +197,10 @@ def main():
         build_scores_train(experiment_name)
     elif args.function_name == 'maketestscores':
         build_scores_test(experiment_name)
+    elif args.function_name == 'makefla':
+        build_fla_measures_train(experiment_name)
+    elif args.function_name == 'makeflatest':
+        build_fla_measures_test(experiment_name)
     else:
         print(f"Unknown function: {args.function_name}")
 

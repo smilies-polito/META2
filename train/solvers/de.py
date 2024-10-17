@@ -30,11 +30,9 @@ class DE(BaseSolver):
     def get_variants():
         return [
             lambda p, b: DE(p, b),
-            lambda p, b: DE(p, b, strategy='rand1bin'),
             lambda p, b: DE(p, b, strategy='best1exp'),
             lambda p, b: DE(p, b, strategy='currenttobest1bin'),
             lambda p, b: DE(p, b, strategy='randtobest1bin'),
-            lambda p, b: DE(p, b, strategy='randtobest1exp'),
             lambda p, b: DE(p, b, strategy='best2exp'),
         ]
 

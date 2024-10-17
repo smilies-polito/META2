@@ -46,11 +46,9 @@ class PSO(BaseSolver):
         return cost_global - cost_local
         
     def get_variants():
-        variants = []
-        for n_particles in [10, 30]:
-            variants += [
-            lambda p, b: PSO(p, b, n_particles=n_particles),
-            lambda p, b: PSO(p, b, social_coefficient=0.5, n_particles=n_particles),
-            lambda p, b: PSO(p, b, social_coefficient=0.1, n_particles=n_particles),
-            ]
+        variants = [
+            lambda p, b: PSO(p, b, n_particles=15),
+            lambda p, b: PSO(p, b, social_coefficient=0.5, n_particles=15),
+            lambda p, b: PSO(p, b, social_coefficient=0.1, n_particles=15),
+        ]
         return variants

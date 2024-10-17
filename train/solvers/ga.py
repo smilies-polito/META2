@@ -57,16 +57,13 @@ class GA(BaseSolver):
     
 
     def get_variants():
-        variants = []
-        for mutation in [0.1, 0.2]:
-            variants += [
-                lambda p, b: GA(p, b, mutation_p=mutation),
-                lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform"),
-                lambda p, b: GA(p, b, mutation_p=mutation, cr_type="scattered"),
-                lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rws"),
-                lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rank"),
-                lambda p, b: GA(p, b, mutation_p=mutation, mutation_type="scramble"),
-            ]
+        mutation = 0.2
+        variants = [
+            lambda p, b: GA(p, b, mutation_p=mutation),
+            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform"),
+            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="scattered"),
+            lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rank"),
+        ]
         return variants
 
     def solve_with_starting_population(starting_population, problem, PARENT_SELECTION_TYPE="sss",CR_TYPE="single_point"):
