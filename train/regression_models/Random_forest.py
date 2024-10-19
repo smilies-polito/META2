@@ -12,9 +12,10 @@ class RandomForest_Model:
     def convert_dtype(X):
         if X is None:
             return X
-        X_converted = X.astype('float32')
-        X_converted[np.isinf(X_converted)] = np.finfo(np.float32).max
-        return X_converted
+        X = np.array([x.astype('float32') for x in X])
+        for x in X:
+            x[np.isinf(x)] = np.finfo(np.float32).max
+        return X
 
     def train(self, X_train, y_train):
         X_train, y_train = RandomForest_Model.convert_dtype(X_train), RandomForest_Model.convert_dtype(y_train)

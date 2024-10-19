@@ -30,4 +30,10 @@ dataset/%/fla.pickle: | dataset/%/train_functions.pickle
 dataset/%/fla_test.pickle: | dataset/%/test_functions.pickle
 	python3 train.py makeflatest $*
 
+#Train and test
+
+dataset/%/test_logs.txt: dataset/%/fla_test.pickle dataset/%/test_scores.pickle
+	python3 train.py trainandtest $* > dataset/$*/test_logs.txt
+	
+#> dataset/$*/test_logs.txt
 

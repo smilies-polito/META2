@@ -1,5 +1,5 @@
-from meta_optimization_model.SVR import *
-from meta_optimization_model.Random_forest import *
+from regression_models.SVR import *
+from regression_models.Random_forest import *
 import copy 
 import os
 

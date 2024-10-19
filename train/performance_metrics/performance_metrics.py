@@ -3,7 +3,7 @@ import numpy as np
 
 #Raw scores, array in form [[fitness for each F] for each A]
 def full_comparison_oriented_scores(raw_scores):
-    for function_i in len(raw_scores[0]):
+    for function_i in range(len(raw_scores[0])):
         solutions = [raw_scores[i][function_i] for i in range(len(raw_scores))]
         #Get best and worst solutions
         best_solution = min(solutions)

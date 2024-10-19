@@ -81,7 +81,7 @@ class GA(BaseSolver):
                         parent_selection_type=PARENT_SELECTION_TYPE,
                         keep_parents=1,
                         crossover_type=CR_TYPE,
-                        mutation_type="random",
+                        mutation_type=None,
                         mutation_percent_genes=1,
                         gene_space=gene_space)
         ga_instance.population = starting_population

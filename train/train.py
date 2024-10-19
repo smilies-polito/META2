@@ -20,6 +20,10 @@ import numpy as np
 from functions import get_base_functions, get_split_functions, augment_functions
 from algorithms import get_algorithms_lambdas
 from fla.FLA import FLA
+from performance_metrics.performance_metrics import full_comparison_oriented_scores
+from regression_models.Random_forest import *
+from regression_models.Ensemble_model import *
+
 
 DATASET_PATH = "dataset"
 #New experiment. Experiment name as argument. Copy default config is config file not existing
@@ -114,18 +118,38 @@ def build_scores_test(experiment_name):
         pickle.dump([transformed_scores_train, transformed_scores_test], f)
 
 #Compute and export FLA measures
-def compute_FLA_measures(functions, config):
-    return [
-        FLA.get_FLA_measures(function, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
-        for function in functions
-    ]
+def get_fla(args):
+    try:
+        f, config = args
+        return FLA.get_FLA_measures(f, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
+    except:
+        return get_fla((f, config))
+def compute_FLA_split(functions, config):
+    if (config["MULTI_PROCESS"] > 1):
+        with Pool(config["MULTI_PROCESS"]) as pool:
+            return pool.map(get_fla, [(f, config) for f in functions])
+    else:
+        return list(map(get_fla, [(f, config) for f in functions]))
+
+def compute_FLA_measures(functions, config, file_name):
+    if os.path.isfile(file_name):
+        with open(file_name, "rb") as f:
+            fla = pickle.load(f)
+    else:
+        fla = []
+    while len(fla)<len(functions):
+        print(f"Computing split from {len(fla)} over {len(functions)}")
+        fla += compute_FLA_split(functions[len(fla):min(len(functions), len(fla)+30)], config)
+        with open(file_name, "wb") as f:
+            pickle.dump(fla, f)
+    return fla
 
 def build_fla_measures_train(experiment_name):
     config = load_config(experiment_name)
     path = f"{DATASET_PATH}/{experiment_name}"
     with open(f"{path}/train_functions.pickle", "rb") as f:
         functions = pickle.load(f)
-    fla = compute_FLA_measures(functions, config)
+    fla = compute_FLA_measures(functions, config, f"{path}/fla.pickle")
     with open(f"{path}/fla.pickle", "wb") as f:
         pickle.dump(fla, f)
 def build_fla_measures_test(experiment_name):
@@ -133,10 +157,12 @@ def build_fla_measures_test(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
     with open(f"{path}/test_functions.pickle", "rb") as f:
         train_functions, test_functions = pickle.load(f)
-    fla_train = compute_FLA_measures(train_functions, config)
-    fla_test = compute_FLA_measures(test_functions, config)
+    fla_train = compute_FLA_measures(train_functions, config, f"{path}/fla_test_temp_1.pickle")
+    fla_test = compute_FLA_measures(test_functions, config, f"{path}/fla_test_temp_2.pickle")
     with open(f"{path}/fla_test.pickle", "wb") as f:
         pickle.dump([fla_train, fla_test], f)
+    os.remove(f"{path}/fla_test_temp_1.pickle")
+    os.remove(f"{path}/fla_test_temp_2.pickle")
 
 
 #Training and testing of regression model(s)
@@ -145,24 +171,21 @@ def build_dataset(scores, fla_measures):
     #scores: [[score for f in functions] for a in algorithm]
     #Training dataset: [(FLA, scores for each algorithm) for each function]
     x = np.array(fla_measures)
-    y = np.array([(scores[a][i] for a in range(len(scores))) for i in range(len(scores[0]))])
+    y = np.array([[scores[a][i] for a in range(len(scores))] for i in range(len(scores[0]))])
     return x, y
 
 def train_and_test(experiment_name):
+    config = load_config(experiment_name)
+    path = f"{DATASET_PATH}/{experiment_name}"
     #Load FLA measures
     with open(f"{path}/fla_test.pickle", "rb") as f:
         fla_train, fla_test = pickle.load(f)
     #Load scores
     with open(f"{path}/test_scores.pickle", "rb") as f:
         scores_train, scores_test = pickle.load(f)
+    
     #Build dataset
-    x_train, y_train = build_dataset(scores_train, fla_train)
-    x_test, y_test = build_dataset(scores_test, fla_test)
-
-    for model in [RandomForest_Model(max_features="sqrt"), RandomForest_Model(criterion="absolute_error"), EnsembleModel()]:
-        train_error, _ = model.train(x_train, y_train)
-        _, error = model.test(x_test, y_test)
-        print(train_error, error)
+    #TODO
 
 
 def main():
@@ -171,7 +194,7 @@ def main():
     parser.add_argument(
         'function_name',
         type=str,
-        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores'],
+        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores','makeflatest','makefla','trainandtest'],
         help="Using this file by hand is not recommended. Use the makefile to train the model"
     )
     parser.add_argument(
@@ -201,6 +224,8 @@ def main():
         build_fla_measures_train(experiment_name)
     elif args.function_name == 'makeflatest':
         build_fla_measures_test(experiment_name)
+    elif args.function_name == 'trainandtest':
+        train_and_test(experiment_name)
     else:
         print(f"Unknown function: {args.function_name}")
 

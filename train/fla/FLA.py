@@ -277,7 +277,7 @@ class FLA:
     r2py_active = False
     def get_FLA_measures(problem: BaseProblem, sample_size, FEM_params, jensens_inequality_N, NON_DETERMINISTIC=False):
         #Activate r2py
-        if not r2py_active:
+        if not FLA.r2py_active:
             numpy2ri.activate()
             r.source('fla/flacco_FLA.r')
             r2py_active = True
@@ -288,7 +288,7 @@ class FLA:
         for _ in range(FEM_params["repeat_random_walk"]):
             for r_w in FEM_params["random_walks"]:
                 random_walk, random_walk_states = FEM.continuous_random_increasing_walk(problem, r_w["random_walk_len"], r_w["step_size"])
-                random_walks.append(random_walk, random_walk_states)
+                random_walks.append(random_walk)
                 sampled_points = np.vstack((random_walk_states, sampled_points))
                 fitness_values = np.concatenate((random_walk, fitness_values))
         
@@ -297,9 +297,9 @@ class FLA:
         if NON_DETERMINISTIC:
             measures += NonDeterminismFLA.get_nd_measures(problem, sampled_points, fitness_values)
         #Dimensionality measure
-        measures.append(FLA.get_dimensionality(problem))
+        measures.append(len(problem.get_ranges()))
         #FEM measure
-        for random_walk, _ in random_walks:
+        for random_walk in random_walks:
             measures += [
                 FEM.entropic_measure(FEM.psi_function(random_walk, epsilon))
                 for epsilon in FEM_params["epsilon"]
@@ -318,5 +318,5 @@ class FLA:
         measures += SimpleEvolvability.get_evolvability_de(sampled_points, fitness_values, problem, 9)
         #measures += PSO.local_vs_globalperformance(problem)
         #Flacco
-        measures += FlaccoFLA.get_features(sampled_points, fitness_values)
+        measures = np.concatenate((np.array(measures),FlaccoFLA.get_features(sampled_points, fitness_values)))
         return measures
