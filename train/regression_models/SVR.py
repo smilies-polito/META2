@@ -11,6 +11,14 @@ class SVR_Model:
         self.std__ = None; self.mean__ = None
         self.models = None
 
+    def convert_dtype(X):
+        if X is None:
+            return X
+        X = np.array([x.astype('float32') for x in X])
+        for x in X:
+            x[np.isinf(x)] = np.finfo(np.float32).max
+        return X
+
     def normalize_input(self, X):
         if (self.std__ is None):
             std__ =  np.std(X, axis=0)

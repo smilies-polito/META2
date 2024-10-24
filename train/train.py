@@ -24,7 +24,9 @@ from algorithms import get_algorithms_lambdas
 from fla.FLA import FLA
 from performance_metrics.performance_metrics import full_comparison_oriented_scores
 from regression_models.Random_forest import *
-
+from regression_models.Ensemble_model import *
+from regression_models.MLP_model import *
+from regression_models.KNN_Regressor import *
 
 DATASET_PATH = "dataset"
 SEED = 33
@@ -181,16 +183,6 @@ def build_dataset(scores, fla_measures):
     x = np.array(fla_measures)
     y = np.array([[scores[a][i] for a in range(len(scores))] for i in range(len(scores[0]))])
     return x, y
-def preprocess_1(x_tr, x_te):
-    x_tr = copy.deepcopy(x_tr)
-    x_te = copy.deepcopy(x_te)
-    x_tr = np.array([x.astype('float32') for x in x_tr])
-    for x in x_tr:
-        x[np.isinf(x)] = np.finfo(np.float32).max
-    x_te = np.array([x.astype('float32') for x in x_te])
-    for x in x_te:
-        x[np.isinf(x)] = np.finfo(np.float32).max
-    return x_tr, x_te
 
 def train_and_test(experiment_name):
     config = load_config(experiment_name)
@@ -201,7 +193,22 @@ def train_and_test(experiment_name):
     #Load scores
     with open(f"{path}/test_scores.pickle", "rb") as f:
         scores_train, scores_test = pickle.load(f)
-    #todo
+    #Build dataset
+    x_train, y_train = build_dataset(scores_train, fla_train)
+    x_test, y_test = build_dataset(scores_test, fla_test)
+
+    def test_model(name, model, x_tr, y_tr, x_te, y_te):
+        print(f"\n\nTesting model {name}..........................")
+        train_error, _ = model.train(x_tr, y_tr)
+        predictions, error = model.test(x_te, y_te)
+        print("Averages:", "Train:", np.mean(train_error), "Test:", np.mean(error))
+        print("Ratio:", np.mean(error / np.var(y_te, 0)))
+        print("Ratio-algorithm_specific:", error / np.var(y_te, 0))
+
+    test_model(
+        "MLP model", MLP_Model(alpha=0.1,hidden_layer_sizes=(50, 50, 30, 10),max_iter=1500,convert_dtype=True), 
+        x_train, y_train, x_test, y_test)
+
 
 
 def main():
