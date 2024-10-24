@@ -31,6 +31,8 @@ class Multiplied_problems(BaseProblem):
         self.name = f"{problem_1.get_name()}_mul_{problem_2.get_name()}"
         self.fitness_ranges_1 = problem_1.get_fitness_range_estimate()
         self.fitness_ranges_2 = problem_2.get_fitness_range_estimate()
+        assert self.fitness_ranges_1[0] != 0, problem_1.get_name()
+        assert self.fitness_ranges_2[0] != 0, problem_2.get_name()
         if (problem_1.get_dimensions() > problem_2.get_dimensions()):
             self.ranges = problem_1.get_ranges()
             self.dimensions = problem_1.get_dimensions()

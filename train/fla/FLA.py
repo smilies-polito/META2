@@ -122,12 +122,20 @@ class DispersionMetric:
 class JensensInequalityRatio:
     def get_jensen_inequality_ratio(problem: BaseProblem, sampled_points: np.array, fitness_values: np.array, N: int):
         count = 0
+        v1, v2 = [], []
+        r = np.array([b[1]-b[0] for b in problem.get_ranges()])
         for _ in range(N):
             i, j = np.random.choice(len(sampled_points), 2, replace=False)
             middle_point = problem.get_value((sampled_points[i] + (sampled_points[j]))/2)
             if (middle_point < (fitness_values[i] + fitness_values[j])/2):
                 count += 1
-        return count/N
+                v1.append(np.linalg.norm((sampled_points[i] - sampled_points[j])/r))
+            else:
+                v2.append(np.linalg.norm((sampled_points[i] - sampled_points[j])/r))
+        difference = np.mean(v1) - np.mean(v2)
+        if np.isnan(difference):
+            difference = 0
+        return count/N, difference
 
 class FitnessEstimator:
     def get_fitness_est_measure(sampled_points: np.array, fitness_values: np.array):
@@ -309,14 +317,13 @@ class FLA:
         #FDC measure
         measures += FDC.get_FDC(problem, sampled_points, fitness_values)
         #Jensen's inequality ratio
-        measures.append(JensensInequalityRatio.get_jensen_inequality_ratio(problem, sampled_points, fitness_values, jensens_inequality_N))
+        measures += JensensInequalityRatio.get_jensen_inequality_ratio(problem, sampled_points, fitness_values, jensens_inequality_N)
         measures += FitnessEstimator.get_fitness_est_measure(sampled_points, fitness_values)
         #Evolvability
         measures += SimpleEvolvability.get_evolvability(sampled_points, fitness_values)
         measures += [np.percentile(fitness_values, 10),np.percentile(fitness_values, 90)]
         measures += SimpleEvolvability.get_evolvability_ga(sampled_points, fitness_values, problem, 10)
         measures += SimpleEvolvability.get_evolvability_de(sampled_points, fitness_values, problem, 9)
-        #measures += PSO.local_vs_globalperformance(problem)
         #Flacco
         measures = np.concatenate((np.array(measures),FlaccoFLA.get_features(sampled_points, fitness_values)))
         return measures

@@ -28,5 +28,10 @@ def get_functions():
     for i in range(2,5):
         f_i = bench.get_functions(i, continuous=True)
         f_i = [WrapperForPythonBenchmark(f(i), i) for f in f_i]
-        functions.extend(f_i)
+        functions += f_i
+        f_i_d = bench.get_functions(i, continuous=True)
+        f_i_d = [WrapperForPythonBenchmark(f(i), i) for f in f_i_d]
+        for f in f_i_d:
+            f.ranges = f.ranges / 2
+        functions += f_i_d
     return functions

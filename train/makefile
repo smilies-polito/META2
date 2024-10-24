@@ -34,6 +34,7 @@ dataset/%/fla_test.pickle: | dataset/%/test_functions.pickle
 
 dataset/%/test_logs.txt: dataset/%/fla_test.pickle dataset/%/test_scores.pickle
 	python3 train.py trainandtest $* > dataset/$*/test_logs.txt
-	
+
+
 #> dataset/$*/test_logs.txt
 

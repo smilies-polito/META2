@@ -47,8 +47,7 @@ class PSO(BaseSolver):
         
     def get_variants():
         variants = [
-            lambda p, b: PSO(p, b, n_particles=15),
-            lambda p, b: PSO(p, b, social_coefficient=0.5, n_particles=15),
-            lambda p, b: PSO(p, b, social_coefficient=0.1, n_particles=15),
+            lambda p, b: PSO(p, b, n_particles=30),
+            lambda p, b: PSO(p, b, social_coefficient=0.5, n_particles=30)
         ]
         return variants

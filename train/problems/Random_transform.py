@@ -21,6 +21,9 @@ class Random_transform(BaseProblem):
             [0]*(self.problem.dimensions-2) + [np.sin(self.rotation), np.cos(self.rotation)]
         ])
 
+    def can_rotate(self):
+        return self.problem.can_rotate()
+
     def get_value(self, point: np.ndarray) -> float: 
         if (self.problem.can_rotate()):
             rotated_point = np.dot(self.rotation_matrix, point)

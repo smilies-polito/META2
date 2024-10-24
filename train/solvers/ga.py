@@ -10,7 +10,7 @@ class GA(BaseSolver):
         return f"ga-ps_{self.parent_selection_type}-cr_{self.crossover_type}-mp_{self.mutation_p}-mt_{self.mutation_type}"
         
     def __init__(self, problem: BaseProblem, budget=10000,
-        parent_selection_type="sss", cr_type="single_point", mutation_p=0.1, pop_size=32, p_mating=6, mutation_type="random",):
+        parent_selection_type="sss", cr_type="single_point", mutation_p=0.2, pop_size=32, p_mating=6, mutation_type="random",):
         
         self.problem = problem
         self.budget = budget
@@ -57,12 +57,10 @@ class GA(BaseSolver):
     
 
     def get_variants():
-        mutation = 0.2
+        mutation = 0.25
         variants = [
             lambda p, b: GA(p, b, mutation_p=mutation),
-            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform"),
-            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="scattered"),
-            lambda p, b: GA(p, b, mutation_p=mutation, parent_selection_type="rank"),
+            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform")
         ]
         return variants
 

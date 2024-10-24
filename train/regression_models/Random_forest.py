@@ -4,13 +4,14 @@ import numpy as np
 import pickle
 
 class RandomForest_Model:
-    def __init__(self, n_estimators=100, criterion='squared_error', max_features=1):
+    def __init__(self, n_estimators=100, criterion='squared_error', max_features=1,min_samples_split=2,bootstrap=True, convert_dtype=False):
         #criteiron=absolute_error
         #max_features = "sqrt"
-        self.model = RandomForestRegressor(n_estimators=n_estimators, criterion=criterion, max_features=max_features)
+        self.model = RandomForestRegressor(n_estimators=n_estimators, criterion=criterion, max_features=max_features, min_samples_split=min_samples_split,bootstrap=bootstrap)
+        self.convert_dtype = convert_dtype
 
-    def convert_dtype(X):
-        if X is None:
+    def run_convert_dtype(self,X):
+        if X is None or self.convert_dtype==False:
             return X
         X = np.array([x.astype('float32') for x in X])
         for x in X:
@@ -18,13 +19,13 @@ class RandomForest_Model:
         return X
 
     def train(self, X_train, y_train):
-        X_train, y_train = RandomForest_Model.convert_dtype(X_train), RandomForest_Model.convert_dtype(y_train)
+        X_train, y_train = self.run_convert_dtype(X_train), self.run_convert_dtype(y_train)
         self.model.fit(X_train, y_train)
         predictions = self.model.predict(X_train)
         return np.mean([mean_squared_error(y_train[:,i], predictions[:,i]) for i in range(y_train.shape[1])]), predictions #.score(X_train, y_train)
 
     def test(self, X_test, y_test=None):
-        X_test, y_test = RandomForest_Model.convert_dtype(X_test), RandomForest_Model.convert_dtype(y_test)
+        X_test, y_test = self.run_convert_dtype(X_test), self.run_convert_dtype(y_test)
         predictions = self.model.predict(X_test)
         if y_test is None:
             return predictions, None

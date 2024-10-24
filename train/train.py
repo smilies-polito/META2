@@ -16,16 +16,19 @@ import os
 import pickle
 from multiprocessing import Pool
 import numpy as np
+import time
+import copy
 
-from functions import get_base_functions, get_split_functions, augment_functions
+from functions import get_base_functions,get_function_test, augment_functions
 from algorithms import get_algorithms_lambdas
 from fla.FLA import FLA
 from performance_metrics.performance_metrics import full_comparison_oriented_scores
 from regression_models.Random_forest import *
-from regression_models.Ensemble_model import *
 
 
 DATASET_PATH = "dataset"
+SEED = 33
+
 #New experiment. Experiment name as argument. Copy default config is config file not existing
 def new_experiment(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
@@ -56,9 +59,14 @@ def define_train_function_set(experiment_name):
 #Define two sets of functions to train and validate the model
 def define_test_function_set(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
-    train_functions, test_functions = get_split_functions()
+    train_functions, n1, test_functions, n2 = get_function_test(SEED)
+    with open(f"{path}/function_names.txt", "w") as f:
+        f.write(str(n1))
+        f.write("\n\n")
+        f.write(str(n2))
     train_functions = augment_functions(train_functions)
     test_functions = augment_functions(test_functions)
+    print(f"Len training fun: {len(train_functions)} - Len test fun: {len(test_functions)}")
     with open(f"{path}/test_functions.pickle", "wb") as f:
         pickle.dump([train_functions, test_functions], f)
 
@@ -173,6 +181,16 @@ def build_dataset(scores, fla_measures):
     x = np.array(fla_measures)
     y = np.array([[scores[a][i] for a in range(len(scores))] for i in range(len(scores[0]))])
     return x, y
+def preprocess_1(x_tr, x_te):
+    x_tr = copy.deepcopy(x_tr)
+    x_te = copy.deepcopy(x_te)
+    x_tr = np.array([x.astype('float32') for x in x_tr])
+    for x in x_tr:
+        x[np.isinf(x)] = np.finfo(np.float32).max
+    x_te = np.array([x.astype('float32') for x in x_te])
+    for x in x_te:
+        x[np.isinf(x)] = np.finfo(np.float32).max
+    return x_tr, x_te
 
 def train_and_test(experiment_name):
     config = load_config(experiment_name)
@@ -183,9 +201,7 @@ def train_and_test(experiment_name):
     #Load scores
     with open(f"{path}/test_scores.pickle", "rb") as f:
         scores_train, scores_test = pickle.load(f)
-    
-    #Build dataset
-    #TODO
+    #todo
 
 
 def main():
