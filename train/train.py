@@ -18,9 +18,11 @@ from multiprocessing import Pool
 import numpy as np
 import time
 import copy
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 from functions import get_base_functions,get_function_test, augment_functions
-from algorithms import get_algorithms_lambdas
+from algorithms import get_algorithms_lambdas, get_algorithms_names
 from fla.FLA import FLA
 from performance_metrics.performance_metrics import full_comparison_oriented_scores
 from regression_models.Random_forest import *
@@ -201,14 +203,51 @@ def train_and_test(experiment_name):
         print(f"\n\nTesting model {name}..........................")
         train_error, _ = model.train(x_tr, y_tr)
         predictions, error = model.test(x_te, y_te)
-        print("Averages:", "Train:", np.mean(train_error), "Test:", np.mean(error))
+        print("Average errors:", "Train:", np.mean(train_error), "Test:", np.mean(error))
         print("Ratio:", np.mean(error / np.var(y_te, 0)))
-        print("Ratio-algorithm_specific:", error / np.var(y_te, 0))
+        print("Average error over algorithms:", error)
+        with open(f"{path}/test_results/predictions.pickle", "wb") as f:
+            pickle.dump([predictions, y_te],f)
 
     test_model(
-        "MLP model", MLP_Model(alpha=0.1,hidden_layer_sizes=(50, 50, 30, 10),max_iter=1500,convert_dtype=True), 
+        "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=100,max_features=70,convert_dtype=True), 
         x_train, y_train, x_test, y_test)
 
+def plot_error(experiment_name):
+    path = f"{DATASET_PATH}/{experiment_name}"
+    with open(f"{path}/test_results/predictions.pickle", "rb") as f:
+        predictions, truth = pickle.load(f)
+    #Compute matrix of squared error
+    error_matrix = (predictions - truth)**2
+    
+    #Generate violin plots
+    data = error_matrix
+    names = get_algorithms_names()
+    plt.figure(figsize=(16, 6))
+    sns.violinplot(data=data,inner="box", palette="husl")
+    plt.legend()
+    plt.xticks(ticks=range(len(names)), labels=names)
+    plt.title("Distribution of squared errors over the 10 algorithms' predictions")
+    plt.xlabel("Algorithm")
+    plt.savefig(f"{path}/test_results/squared_errors.png") 
+
+    #Decision error
+    decisions = np.argmax(predictions, 1)
+    performance = 1 - np.array([truth[i][decisions[i]] for i in range(truth.shape[0])])
+    plt.figure(figsize=(6, 6))
+    sns.boxplot(data=performance, palette="husl")
+    plt.legend()
+    plt.title("Distribution of decision errors")
+    plt.savefig(f"{path}/test_results/decision_errors.png") 
+    print("Average decision error:", np.mean(performance))
+    print("Quartiles", np.quantile(performance, 0.25), np.quantile(performance, 0.75))
+
+    
+
+
+#Varianza dell'errore quadratico sulla dimensione delle funzioni
+#Violin plot su errore quadratico, per ogni algoritmo
+#Grid search con sklearn - oppure libreria python itertools
 
 
 def main():
@@ -217,7 +256,7 @@ def main():
     parser.add_argument(
         'function_name',
         type=str,
-        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores','makeflatest','makefla','trainandtest'],
+        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores','makeflatest','makefla','trainandtest','ploterror'],
         help="Using this file by hand is not recommended. Use the makefile to train the model"
     )
     parser.add_argument(
@@ -249,6 +288,8 @@ def main():
         build_fla_measures_test(experiment_name)
     elif args.function_name == 'trainandtest':
         train_and_test(experiment_name)
+    elif args.function_name == 'ploterror':
+        plot_error(experiment_name)
     else:
         print(f"Unknown function: {args.function_name}")
 

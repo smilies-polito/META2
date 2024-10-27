@@ -32,8 +32,16 @@ dataset/%/fla_test.pickle: | dataset/%/test_functions.pickle
 
 #Train and test
 
-dataset/%/test_logs.txt: dataset/%/fla_test.pickle dataset/%/test_scores.pickle
-	python3 train.py trainandtest $* > dataset/$*/test_logs.txt
+dataset/%/test_results/: dataset/%/fla_test.pickle dataset/%/test_scores.pickle
+	mkdir dataset/$*/test_results/
+	python3 train.py trainandtest $* > dataset/$*/test_results/logs.txt
+
+dataset/%/test_results/plots: dataset/%/test_results/predictions.pickle
+	python3 train.py ploterror $* 
+
+%/clean_results: dataset/%/test_results/
+	rm -rf dataset/$*/test_results/
+
 
 
 #> dataset/$*/test_logs.txt

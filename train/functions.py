@@ -118,7 +118,7 @@ def get_function_test(seed):
 #Perform data augmentation
 def augment_functions(base_functions):
     functions =  [Random_transform(problem, 0.3) for problem in base_functions*2]
-    N = len(base_functions)*4
+    N = len(base_functions)*5
     for i in range(N):
         f1, f2 = random.choice(functions), random.choice(functions)
         functions.append(Summed_problems(f1, f2, weight_1=random.random()*0.7+0.15))
@@ -132,5 +132,12 @@ def augment_functions(base_functions):
         function_set_2.append(Summed_problems(f1, f2, weight_1=random.random()*0.7+0.15))
         f1, f2 = random.choice(function_set_2), random.choice(base_functions)
         function_set_2.append(Multiplied_problems(f1, f2))
-    return functions+function_set_2
+    function_set_3 = [Random_transform(problem, 0.3) for problem in base_functions]
+    N = len(base_functions)*6
+    for i in range(N):
+        f1, f2 = random.choice(function_set_3), random.choice(base_functions)
+        function_set_3.append(Summed_problems(f1, f2, weight_1=random.random()*0.7+0.15))
+        f1, f2 = random.choice(function_set_3), random.choice(base_functions)
+        function_set_3.append(Multiplied_problems(f1, f2))
+    return functions+function_set_2+function_set_3
 
