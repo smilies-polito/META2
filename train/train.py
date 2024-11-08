@@ -209,8 +209,21 @@ def train_and_test(experiment_name):
         with open(f"{path}/test_results/predictions.pickle", "wb") as f:
             pickle.dump([predictions, y_te],f)
 
-    test_model(
+
+    """test_model(
+        "RF_Model", MLP_Model(alpha=0.5, hidden_layer_sizes=(200,100,40,10,10),max_iter=3000,convert_dtype=True),
+    x_train, y_train, x_test, y_test)""" #C
+    """test_model(
+        "RF_Model", MLP_Model(alpha=0.3, hidden_layer_sizes=(120,80,10,10,10),max_iter=2500,convert_dtype=True),
+    x_train, y_train, x_test, y_test)""" #B
+    """test_model(
+        "RF_Model", MLP_Model(alpha=0.3, hidden_layer_sizes=(100,50,10,10,10),max_iter=1500,convert_dtype=True),
+    x_train, y_train, x_test, y_test)""" #A
+    """test_model(
         "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=100,max_features=70,convert_dtype=True), 
+        x_train, y_train, x_test, y_test)"""#Base
+    test_model(
+        "RF_Model", RandomForest_Model(min_samples_split=4,n_estimators=110,max_features=200,convert_dtype=True), 
         x_train, y_train, x_test, y_test)
 
 def plot_error(experiment_name):
@@ -219,17 +232,16 @@ def plot_error(experiment_name):
         predictions, truth = pickle.load(f)
     #Compute matrix of squared error
     error_matrix = (predictions - truth)**2
-    
+    names = get_algorithms_names()
     #Generate violin plots
     data = error_matrix
-    names = get_algorithms_names()
     plt.figure(figsize=(16, 6))
     sns.violinplot(data=data,inner="box", palette="husl")
     plt.legend()
     plt.xticks(ticks=range(len(names)), labels=names)
     plt.title("Distribution of squared errors over the 10 algorithms' predictions")
     plt.xlabel("Algorithm")
-    plt.savefig(f"{path}/test_results/squared_errors.png") 
+    plt.savefig(f"{path}/test_results/squared_errors.png")
 
     #Decision error
     decisions = np.argmax(predictions, 1)
@@ -241,6 +253,39 @@ def plot_error(experiment_name):
     plt.savefig(f"{path}/test_results/decision_errors.png") 
     print("Average decision error:", np.mean(performance))
     print("Quartiles", np.quantile(performance, 0.25), np.quantile(performance, 0.75))
+
+    #Divide "performance" array in sub-arrays depending on the actual ground truth
+    ground_truth = np.argmax(truth, 1)
+    performances = [performance[ground_truth==i] for i in range(truth.shape[1])]
+    
+    rows, cols = 2, 5
+    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 6 * rows), sharey=True)
+    axes = axes.flatten()
+    # Loop through each column to plot in a single figure
+    for i in range(truth.shape[1]):
+        sns.boxplot(data=performances[i], palette="husl", ax=axes[i])
+        axes[i].set_title(f"{names[i]}")  # Optional: add titles for each subplot
+
+    # Save the entire figure
+    plt.tight_layout()
+    plt.savefig(f"{path}/test_results/decision_errors_by_truth.png")
+
+    #Soft performance scores
+    ground_truth = np.argmax(truth, 1)
+    performances = [performance[truth[:,i]>=0.95] for i in range(truth.shape[1])]
+    
+    rows, cols = 2, 5
+    fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 6 * rows), sharey=True)
+    axes = axes.flatten()
+    # Loop through each column to plot in a single figure
+    for i in range(truth.shape[1]):
+        sns.boxplot(data=performances[i], palette="husl", ax=axes[i])
+        axes[i].set_title(f"{names[i]}")  # Optional: add titles for each subplot
+
+    # Save the entire figure
+    plt.tight_layout()
+    plt.savefig(f"{path}/test_results/soft_decision_errors_by_truth.png")
+    
 
     
 

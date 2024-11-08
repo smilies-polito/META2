@@ -5,10 +5,10 @@ import numpy as np
 import pickle
 
 class MLP_Model:
-    def __init__(self, alpha=0.0001,hidden_layer_sizes=(100,),max_iter=200,convert_dtype=False):
+    def __init__(self, alpha=0.0001,hidden_layer_sizes=(100,),max_iter=200,solver="adam",convert_dtype=False):
         #alpha: between 0.001 and 0.8
         #Hidden layer sizes; (30,30,) ..?
-        self.model = MLPRegressor(hidden_layer_sizes=hidden_layer_sizes,alpha=alpha,max_iter=max_iter)
+        self.model = MLPRegressor(hidden_layer_sizes=hidden_layer_sizes,alpha=alpha,max_iter=max_iter,solver=solver,learning_rate="adaptive")
         self.mean = None
         self.convert_dtype=convert_dtype
 
