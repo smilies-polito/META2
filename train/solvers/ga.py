@@ -20,6 +20,10 @@ class GA(BaseSolver):
         assert mutation_p >= 0 and mutation_p <= 1
         assert cr_type in ["single_point","uniform","scattered"]
         assert mutation_type in ["random", "scramble"]
+        if (parent_selection_type=="sss"):
+            self.budget *= 2
+        else:
+            self.budget = int(self.budget*3/2)
         self.parent_selection_type = parent_selection_type
         self.mutation_p = mutation_p
         self.crossover_type = cr_type

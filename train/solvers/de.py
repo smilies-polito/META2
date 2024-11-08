@@ -17,7 +17,7 @@ class DE(BaseSolver):
         
     def solve(self):
         unique_dimensions = len(set([f"{r[0]}-{r[1]}" for r in self.problem.get_ranges()]))
-        maxiter = int(self.budget/(self.pop_size*unique_dimensions)) 
+        maxiter = int(self.budget/(self.pop_size*len(self.bounds))) 
         fitness_function = lambda solution: self.problem.get_value(np.array(solution))
         result = differential_evolution(fitness_function, self.bounds, strategy=self.strategy, maxiter=maxiter,popsize=self.pop_size)
         n_evaluations = result.nfev
