@@ -57,6 +57,8 @@ def define_train_function_set(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
     functions = get_base_functions()
     functions = augment_functions(functions)
+    #TODO remove:
+    functions = functions[:150]
     with open(f"{path}/train_functions.pickle", "wb") as f:
             pickle.dump(functions, f)
 

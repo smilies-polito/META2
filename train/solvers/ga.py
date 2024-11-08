@@ -16,7 +16,7 @@ class GA(BaseSolver):
         self.budget = budget
 
         #Hyperparameters
-        assert parent_selection_type in ["sss", "rws", "rank"]
+        assert parent_selection_type in ["sss", "rws"]
         assert mutation_p >= 0 and mutation_p <= 1
         assert cr_type in ["single_point","uniform","scattered"]
         assert mutation_type in ["random", "scramble"]
@@ -31,7 +31,7 @@ class GA(BaseSolver):
         self.p_mating = p_mating
         self.mutation_type = mutation_type
 
-        self.num_generations = int(budget/pop_size)
+        self.num_generations = int(self.budget/self.pop_size)
         
     def solve(self):
         init_range_low = [r[0] for r in self.problem.get_ranges()]
@@ -50,7 +50,6 @@ class GA(BaseSolver):
                         init_range_low=init_range_low,
                         init_range_high=init_range_high,
                         parent_selection_type=self.parent_selection_type,
-                        keep_parents=1,
                         crossover_type=self.crossover_type,
                         mutation_type=self.mutation_type,
                         mutation_probability=self.mutation_p,
@@ -61,10 +60,11 @@ class GA(BaseSolver):
     
 
     def get_variants():
-        mutation = 0.25
         variants = [
-            lambda p, b: GA(p, b, mutation_p=mutation),
-            lambda p, b: GA(p, b, mutation_p=mutation, cr_type="uniform")
+            lambda p, b: GA(p, b, mutation_p=0.25),
+            lambda p, b: GA(p, b, mutation_p=0.35),
+            lambda p, b: GA(p, b, mutation_p=0.35, parent_selection_type="rws"),
+            lambda p, b: GA(p, b, mutation_p=0.25, pop_size=48),
         ]
         return variants
 
