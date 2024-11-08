@@ -77,7 +77,7 @@ def define_test_function_set(experiment_name):
 #Solve set of functions with algorithms
 def solve_with_algorithm(args):
     algorithm, repeat = args
-    return np.mean([algorithm.solve() for _ in range(repeat)])
+    return [algorithm.solve() for _ in range(repeat)]
 
 def build_raw_scores(functions, budget, repeat, multi_process):
     algorithms = get_algorithms_lambdas()
