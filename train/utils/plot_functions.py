@@ -1,4 +1,5 @@
-
+import sys 
+sys.path.append("../")
 from functions import get_base_functions, get_split_functions, augment_functions
 import matplotlib.pyplot as plt
 import os

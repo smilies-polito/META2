@@ -2,28 +2,28 @@
 """
     Defines the set of functions to build the training dataset
 """
-from problems.BaseProblem import *
-from problems.Schwefel import *
-from problems.Ackley import *
-from problems.Griewank import *
-from problems.Rana import *
-from problems.Rastrigin import *
-from problems.Rosenbrock import *
-from problems.Salomon import *
-from problems.Benchmark_v1 import *
-from problems.Random_transform import *
-from problems.Multiplied_problems import *
-from problems.Summed_problems import *
-from problems.SinProblem import *
-from problems.Ellipsoidal import Ellipsoidal
-from problems.LinearSlope import LinearSlope
-from problems.Discus import DiscusFunction
-from problems.BentCigar import BentCigar
-from problems.DifferentPowers import DifferentPowers
-from problems.Weierstrass import Weierstrass
-from problems.Schaffers import Schaffers
-from problems.WrapperForPythonBenchmark import get_functions
-from problems.StochasticWrappers import *
+from .BaseProblem import *
+from .Schwefel import *
+from .Ackley import *
+from .Griewank import *
+from .Rana import *
+from .Rastrigin import *
+from .Rosenbrock import *
+from .Salomon import *
+from .Benchmark_v1 import *
+from .Random_transform import *
+from .Multiplied_problems import *
+from .Summed_problems import *
+from .SinProblem import *
+from .Ellipsoidal import Ellipsoidal
+from .LinearSlope import LinearSlope
+from .Discus import DiscusFunction
+from .BentCigar import BentCigar
+from .DifferentPowers import DifferentPowers
+from .Weierstrass import Weierstrass
+from .Schaffers import Schaffers
+from .WrapperForPythonBenchmark import get_functions
+from .StochasticWrappers import *
 import random 
 import re 
 

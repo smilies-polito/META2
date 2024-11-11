@@ -21,14 +21,12 @@ import copy
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-from functions import get_base_functions,get_function_test, augment_functions
-from algorithms import get_algorithms_lambdas, get_algorithms_names
+from problems.functions import get_base_functions,get_function_test, augment_functions
+from solvers.algorithms import get_algorithms_lambdas, get_algorithms_names
 from fla.FLA import FLA
 from performance_metrics.performance_metrics import full_comparison_oriented_scores
 from regression_models.Random_forest import *
-from regression_models.Ensemble_model import *
 from regression_models.MLP_model import *
-from regression_models.KNN_Regressor import *
 
 DATASET_PATH = "dataset"
 SEED = 33
@@ -57,8 +55,6 @@ def define_train_function_set(experiment_name):
     path = f"{DATASET_PATH}/{experiment_name}"
     functions = get_base_functions()
     functions = augment_functions(functions)
-    #TODO remove:
-    functions = functions[:150]
     with open(f"{path}/train_functions.pickle", "wb") as f:
             pickle.dump(functions, f)
 
@@ -133,11 +129,17 @@ def build_scores_test(experiment_name):
 
 #Compute and export FLA measures
 def get_fla(args):
-    try:
-        f, config = args
-        return FLA.get_FLA_measures(f, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
-    except:
-        return get_fla((f, config))
+    f, config = args
+    #The try-catch block inside the loop is ugly, but sometimes Flacco throws random exceptions that, if not caught, 
+    #result in a massive waste of time. If exceptions are raised more than once, most likely it's not flacco's fault.
+    for i in range(5):
+        try:
+            return FLA.get_FLA_measures(f, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
+        except Exception as e :
+            if i==9:
+                raise e 
+    
+
 def compute_FLA_split(functions, config):
     if (config["MULTI_PROCESS"] > 1):
         with Pool(config["MULTI_PROCESS"]) as pool:
@@ -188,6 +190,20 @@ def build_dataset(scores, fla_measures):
     y = np.array([[scores[a][i] for a in range(len(scores))] for i in range(len(scores[0]))])
     return x, y
 
+def build_model(experiment_name):
+    config = load_config(experiment_name)
+    path = f"{DATASET_PATH}/{experiment_name}"
+    #Load FLA measures
+    with open(f"{path}/fla.pickle", "rb") as f:
+        fla = pickle.load(f)
+    #Load scores
+    with open(f"{path}/train_scores.pickle", "rb") as f:
+        scores = pickle.load(f)
+    X, y = build_dataset(scores, fla)
+    model = RandomForest_Model(min_samples_split=4,n_estimators=110,max_features=200,convert_dtype=True)
+    _ = model.train(X, y)
+    model.export_model(f"{path}/model.pickle")
+
 def train_and_test(experiment_name):
     config = load_config(experiment_name)
     path = f"{DATASET_PATH}/{experiment_name}"
@@ -211,21 +227,13 @@ def train_and_test(experiment_name):
         with open(f"{path}/test_results/predictions.pickle", "wb") as f:
             pickle.dump([predictions, y_te],f)
 
+    
 
     """test_model(
-        "RF_Model", MLP_Model(alpha=0.5, hidden_layer_sizes=(200,100,40,10,10),max_iter=3000,convert_dtype=True),
-    x_train, y_train, x_test, y_test)""" #C
-    """test_model(
-        "RF_Model", MLP_Model(alpha=0.3, hidden_layer_sizes=(120,80,10,10,10),max_iter=2500,convert_dtype=True),
-    x_train, y_train, x_test, y_test)""" #B
-    """test_model(
-        "RF_Model", MLP_Model(alpha=0.3, hidden_layer_sizes=(100,50,10,10,10),max_iter=1500,convert_dtype=True),
-    x_train, y_train, x_test, y_test)""" #A
-    """test_model(
-        "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=100,max_features=70,convert_dtype=True), 
-        x_train, y_train, x_test, y_test)"""#Base
+        "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=120,max_features=110,convert_dtype=True), 
+        x_train, y_train, x_test, y_test)"""
     test_model(
-        "RF_Model", RandomForest_Model(min_samples_split=4,n_estimators=110,max_features=200,convert_dtype=True), 
+        "RF_Model", MLP_Model(alpha=0.5, hidden_layer_sizes=(20,10,10,10),max_iter=3000,convert_dtype=True), 
         x_train, y_train, x_test, y_test)
 
 def plot_error(experiment_name):
@@ -236,22 +244,24 @@ def plot_error(experiment_name):
     error_matrix = (predictions - truth)**2
     names = get_algorithms_names()
     #Generate violin plots
+    FONT_TITLE = 20; FONT_AXIS = 16
     data = error_matrix
     plt.figure(figsize=(16, 6))
     sns.violinplot(data=data,inner="box", palette="husl")
     plt.legend()
-    plt.xticks(ticks=range(len(names)), labels=names)
-    plt.title("Distribution of squared errors over the 10 algorithms' predictions")
-    plt.xlabel("Algorithm")
+    plt.xticks(ticks=range(len(names)), labels=names, fontsize=FONT_AXIS)
+    plt.title("Distribution of squared errors over the algorithms' predictions",fontsize=FONT_TITLE)
+    plt.xlabel("Algorithm",fontsize=FONT_TITLE)
     plt.savefig(f"{path}/test_results/squared_errors.png")
 
     #Decision error
     decisions = np.argmax(predictions, 1)
-    performance = 1 - np.array([truth[i][decisions[i]] for i in range(truth.shape[0])])
+    performance = np.max(truth,1) - np.array([truth[i][decisions[i]] for i in range(truth.shape[0])])
     plt.figure(figsize=(6, 6))
     sns.boxplot(data=performance, palette="husl")
     plt.legend()
-    plt.title("Distribution of decision errors")
+    plt.yticks(fontsize=FONT_AXIS)
+    plt.title("Distribution of decision errors",fontsize=FONT_TITLE)
     plt.savefig(f"{path}/test_results/decision_errors.png") 
     print("Average decision error:", np.mean(performance))
     print("Quartiles", np.quantile(performance, 0.25), np.quantile(performance, 0.75))
@@ -260,41 +270,35 @@ def plot_error(experiment_name):
     ground_truth = np.argmax(truth, 1)
     performances = [performance[ground_truth==i] for i in range(truth.shape[1])]
     
-    rows, cols = 2, 5
+    rows, cols = 2, 6
     fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 6 * rows), sharey=True)
     axes = axes.flatten()
     # Loop through each column to plot in a single figure
     for i in range(truth.shape[1]):
         sns.boxplot(data=performances[i], palette="husl", ax=axes[i])
-        axes[i].set_title(f"{names[i]}")  # Optional: add titles for each subplot
+        axes[i].set_title(f"{names[i]}",fontsize=FONT_TITLE)  # Optional: add titles for each subplot
 
     # Save the entire figure
     plt.tight_layout()
+    plt.yticks(fontsize=FONT_AXIS)
     plt.savefig(f"{path}/test_results/decision_errors_by_truth.png")
 
     #Soft performance scores
-    ground_truth = np.argmax(truth, 1)
-    performances = [performance[truth[:,i]>=0.95] for i in range(truth.shape[1])]
+    loss = truth - predictions
+    soft_p = [performance[loss[:,i]<0.05] for i in range(truth.shape[1])]
     
-    rows, cols = 2, 5
+    rows, cols = 2, 6
     fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 6 * rows), sharey=True)
     axes = axes.flatten()
     # Loop through each column to plot in a single figure
     for i in range(truth.shape[1]):
-        sns.boxplot(data=performances[i], palette="husl", ax=axes[i])
-        axes[i].set_title(f"{names[i]}")  # Optional: add titles for each subplot
+        sns.boxplot(data=soft_p[i], palette="husl", ax=axes[i])
+        axes[i].set_title(f"{names[i]}",fontsize=FONT_TITLE)  # Optional: add titles for each subplot
 
     # Save the entire figure
+    plt.yticks(fontsize=FONT_AXIS)
     plt.tight_layout()
     plt.savefig(f"{path}/test_results/soft_decision_errors_by_truth.png")
-    
-
-    
-
-
-#Varianza dell'errore quadratico sulla dimensione delle funzioni
-#Violin plot su errore quadratico, per ogni algoritmo
-#Grid search con sklearn - oppure libreria python itertools
 
 
 def main():
@@ -303,7 +307,7 @@ def main():
     parser.add_argument(
         'function_name',
         type=str,
-        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores','makeflatest','makefla','trainandtest','ploterror'],
+        choices=['makeversion', 'maketrainfunctions', 'maketestfunctions', 'maketrainrawscores', 'maketestrawscores','maketrainscores','maketestscores','makeflatest','makefla','trainandtest','ploterror','buildmodel'],
         help="Using this file by hand is not recommended. Use the makefile to train the model"
     )
     parser.add_argument(
@@ -337,6 +341,8 @@ def main():
         train_and_test(experiment_name)
     elif args.function_name == 'ploterror':
         plot_error(experiment_name)
+    elif args.function_name == 'buildmodel':
+        build_model(experiment_name)
     else:
         print(f"Unknown function: {args.function_name}")
 
