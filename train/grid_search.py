@@ -61,23 +61,25 @@ def test_fcNN(x, y, K=5):
 
 
 
-def plot_heatmap(X,Y,grid,title,save_path, xLabel, yLabel,aspect="auto"):
+def plot_heatmap(X,Y, grid, title, save_path, xLabel, yLabel,aspect="auto", vmin=0, vmax=1):
     # Example data (replace with your actual data)
     grid = np.array(grid)
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(15.3, 9))
     heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect)
+    #heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect,vmin=vmin, vmax=vmax)
     # Set axis labels
-    plt.xlabel(xLabel,fontsize=16)
-    plt.ylabel(yLabel,fontsize=16)
-    plt.xticks(ticks=np.arange(len(X)), labels=X, fontsize=16)
-    plt.yticks(ticks=np.arange(len(Y)), labels=Y, fontsize=16)
+    plt.xlabel(xLabel,fontsize=32)
+    plt.ylabel(yLabel,fontsize=32)
+    plt.xticks(ticks=np.arange(len(X)), labels=X, fontsize=24)
+    plt.yticks(ticks=np.arange(len(Y)), labels=Y, fontsize=24)
     # Add color bar for error values
     cbar = plt.colorbar(heatmap)
-    cbar.set_label("Error")
+    #cbar.set_label("Error",fontsize=18)
+    cbar.ax.tick_params(labelsize=22)
     for i in range(len(Y)):
         for j in range(len(X)):
-            plt.text(j, i, f"{grid[i, j]:.4f}", ha="center", va="center", color="white")
-    plt.title(title, fontsize=20)
+            plt.text(j, i, f"{grid[i, j]:.4f}", ha="center", va="center", color="white",fontsize=30)
+    plt.title(title, fontsize=32,pad=20)
     plt.savefig(save_path)
 
 def filter_results(results, filters):
@@ -86,20 +88,16 @@ def filter_results(results, filters):
         filter(lambda v: all([v[k]==filters[k] for k in filters.keys()]), results)
     ))
 
-def plot_results_fcNN(path):
-    with open(f"{path}/fcNN_grid_search.pickle", "rb") as f:
-        r = pickle.load(f)
+def plot_results_fcNN(path, r, min_e, max_e):
     alpha_values = [0.5, 0.1, 0.01, 0.001]
     hidden_layer_size_values = [(20,10,10,10),(30, 30, 10, 10),(50, 50, 30, 10),(80,50,30,10), (100, 80, 30, 10),(200,100,40,10)]
     grid = [
         [filter_results(r, {"alpha": alpha, "hidden_layer_sizes": str(l)}) for alpha in alpha_values]
         for l in hidden_layer_size_values
     ]
-    plot_heatmap(alpha_values, hidden_layer_size_values,grid,"Validation error for fcNN", f"{path}/fcNN_heatmap.png", "Alpha","Layers size",aspect=0.5)
+    plot_heatmap(alpha_values, hidden_layer_size_values,grid,"Validation error - fcNN", f"{path}/fcNN_heatmap.png", "Alpha","Layers size",aspect=0.6, vmin=min_e, vmax=max_e)
 
-def plot_results_RF(path):
-    with open(f"{path}/RF_grid_search.pickle", "rb") as f:
-        r = pickle.load(f)
+def plot_results_RF(path, r, min_e, max_e):
     n_estimators = [80, 100, 110, 120]
     min_samples_split = [2, 3, 4, 5]
     max_features = [40, 70,90,110, 200, "sqrt", 1]
@@ -108,20 +106,30 @@ def plot_results_RF(path):
         [filter_results(r, {"n_estimators": n_e, "min_samples_split": m_s_s}) for n_e in n_estimators]
         for m_s_s in min_samples_split
     ]
-    plot_heatmap(n_estimators, min_samples_split,grid,"Validation error for RF", f"{path}/RF_heatmap_1.png", "N. Estimators","Min S. Split")
+    plot_heatmap(n_estimators, min_samples_split,grid,"Validation error - RF", f"{path}/RF_heatmap_1.png", "N. Estimators","Min S. Split", vmin=min_e, vmax=max_e)
     
     grid = [
         [filter_results(r, {"n_estimators": n_e, "max_features": mf}) for n_e in n_estimators]
         for mf in max_features
     ]
-    plot_heatmap(n_estimators, max_features,grid,"Validation error for RF", f"{path}/RF_heatmap_2.png", "N. Estimators","Max Features")
+    plot_heatmap(n_estimators, max_features,grid,"Validation error - RF", f"{path}/RF_heatmap_2.png", "N. Estimators","Max Features", vmin=min_e, vmax=max_e)
     
     grid = [
         [filter_results(r, {"min_samples_split": m_s_s, "max_features": mf}) for m_s_s in min_samples_split]
         for mf in max_features
     ]
-    plot_heatmap(min_samples_split, max_features,grid,"Validation error for RF", f"{path}/RF_heatmap_3.png", "Min S. Split","Max Features")
+    plot_heatmap(min_samples_split, max_features,grid,"Validation error - RF", f"{path}/RF_heatmap_3.png", "Min S. Split","Max Features", vmin=min_e, vmax=max_e)
     
+
+def plot_results(path):
+    with open(f"{path}/RF_grid_search.pickle", "rb") as f:
+        random_forest_results = pickle.load(f)
+    with open(f"{path}/fcNN_grid_search.pickle", "rb") as f:
+        fcnn_results = pickle.load(f)
+    min_e = min(min(map(lambda f: f["error"], random_forest_results)), min(map(lambda f: f["error"], fcnn_results)))
+    max_e = max(max(map(lambda f: f["error"], random_forest_results)), max(map(lambda f: f["error"], fcnn_results)))
+    plot_results_RF(path, random_forest_results, min_e, max_e)
+    plot_results_fcNN(path, fcnn_results, min_e, max_e)
 
 def load_data(path):
     #Load FLA measures
@@ -144,6 +152,23 @@ def run_grid_search(output_dir):
     with open(f"{output_dir}/fcNN_grid_search.pickle", "wb") as f:
         pickle.dump(fcNN_result,f)
 
-run_grid_search("dataset/v6")
-#plot_results_RF("dataset/v6")
-plot_results_fcNN("dataset/v6")
+def main():
+    if len(sys.argv) < 2:
+        print("Error: You must provide a path.")
+        sys.exit(1)
+    path = sys.argv[1]
+
+    plot = '--only_plot' in sys.argv
+    run_search = '--only_run' in sys.argv
+
+    if (not plot and not run_search):
+        plot = True; run_search = True
+
+    if (run_search):
+        run_grid_search(path)
+    if (plot):
+        plot_results(path)
+    
+
+if __name__ == "__main__":
+    main()
