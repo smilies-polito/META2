@@ -34,7 +34,7 @@ def test_random_forest(x, y, K=5):
     i=0
     for n_estimators in [80, 100, 110, 120]:
         for min_samples_split in [2, 3, 4, 5]:
-            for max_features in [40, 70,90,110, 200, "sqrt", 1]:
+            for max_features in [40, 70, 90, 110, 200, "sqrt", 1]:
                 print(i, 4*4*7)
                 m  = lambda: RandomForest_Model(n_estimators=n_estimators, min_samples_split=min_samples_split,max_features=max_features,bootstrap=True,convert_dtype=True)
                 error = run_with_kfold(m, x, y, K)
@@ -47,7 +47,7 @@ def test_random_forest(x, y, K=5):
 def test_fcNN(x, y, K=5):
     results = []
     i=0
-    for MAX_ITER in [3000, 3500]:
+    for MAX_ITER in [3000]:
         for alpha in [0.5, 0.1, 0.01, 0.001]:
             for hidden_layer_sizes in [(20,10,10,10),(30, 30, 10, 10),(50, 50, 30, 10),(80,50,30,10), (100, 80, 30, 10),(200,100,40,10)]:
                 print(i, 2*4*8)
@@ -67,17 +67,17 @@ def plot_heatmap(X,Y,grid,title,save_path, xLabel, yLabel,aspect="auto"):
     plt.figure(figsize=(12, 6))
     heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect)
     # Set axis labels
-    plt.xlabel(xLabel)
-    plt.ylabel(yLabel)
-    plt.xticks(ticks=np.arange(len(X)), labels=X)
-    plt.yticks(ticks=np.arange(len(Y)), labels=Y)
+    plt.xlabel(xLabel,fontsize=16)
+    plt.ylabel(yLabel,fontsize=16)
+    plt.xticks(ticks=np.arange(len(X)), labels=X, fontsize=16)
+    plt.yticks(ticks=np.arange(len(Y)), labels=Y, fontsize=16)
     # Add color bar for error values
     cbar = plt.colorbar(heatmap)
     cbar.set_label("Error")
     for i in range(len(Y)):
         for j in range(len(X)):
             plt.text(j, i, f"{grid[i, j]:.4f}", ha="center", va="center", color="white")
-    plt.title(title)
+    plt.title(title, fontsize=20)
     plt.savefig(save_path)
 
 def filter_results(results, filters):
@@ -137,13 +137,13 @@ def load_data(path):
 
 def run_grid_search(output_dir):
     x_train, y_train, _, _ = load_data(output_dir)
-    rf_result = test_random_forest(x_train, y_train, 5)
+    """rf_result = test_random_forest(x_train, y_train, 5)
     with open(f"{output_dir}/RF_grid_search.pickle", "wb") as f:
-        pickle.dump(rf_result,f)
+        pickle.dump(rf_result,f)"""
     fcNN_result = test_fcNN(x_train, y_train, 5)
     with open(f"{output_dir}/fcNN_grid_search.pickle", "wb") as f:
         pickle.dump(fcNN_result,f)
 
 run_grid_search("dataset/v6")
-plot_results_RF("dataset/v6")
+#plot_results_RF("dataset/v6")
 plot_results_fcNN("dataset/v6")

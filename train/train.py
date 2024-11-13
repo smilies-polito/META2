@@ -227,13 +227,8 @@ def train_and_test(experiment_name):
         with open(f"{path}/test_results/predictions.pickle", "wb") as f:
             pickle.dump([predictions, y_te],f)
 
-    
-
-    """test_model(
-        "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=120,max_features=110,convert_dtype=True), 
-        x_train, y_train, x_test, y_test)"""
     test_model(
-        "RF_Model", MLP_Model(alpha=0.5, hidden_layer_sizes=(20,10,10,10),max_iter=3000,convert_dtype=True), 
+        "RF_Model", RandomForest_Model(min_samples_split=3,n_estimators=120,max_features=200,convert_dtype=True), 
         x_train, y_train, x_test, y_test)
 
 def plot_error(experiment_name):
@@ -244,14 +239,14 @@ def plot_error(experiment_name):
     error_matrix = (predictions - truth)**2
     names = get_algorithms_names()
     #Generate violin plots
-    FONT_TITLE = 20; FONT_AXIS = 16
+    FONT_TITLE = 19; FONT_AXIS = 15
     data = error_matrix
     plt.figure(figsize=(16, 6))
     sns.violinplot(data=data,inner="box", palette="husl")
     plt.legend()
+    plt.yticks(fontsize=FONT_AXIS)
     plt.xticks(ticks=range(len(names)), labels=names, fontsize=FONT_AXIS)
     plt.title("Distribution of squared errors over the algorithms' predictions",fontsize=FONT_TITLE)
-    plt.xlabel("Algorithm",fontsize=FONT_TITLE)
     plt.savefig(f"{path}/test_results/squared_errors.png")
 
     #Decision error
@@ -270,13 +265,14 @@ def plot_error(experiment_name):
     ground_truth = np.argmax(truth, 1)
     performances = [performance[ground_truth==i] for i in range(truth.shape[1])]
     
-    rows, cols = 2, 6
+    rows, cols = 3, 4
     fig, axes = plt.subplots(rows, cols, figsize=(6 * cols, 6 * rows), sharey=True)
     axes = axes.flatten()
     # Loop through each column to plot in a single figure
     for i in range(truth.shape[1]):
         sns.boxplot(data=performances[i], palette="husl", ax=axes[i])
-        axes[i].set_title(f"{names[i]}",fontsize=FONT_TITLE)  # Optional: add titles for each subplot
+        axes[i].set_title(f"{names[i]}",fontsize=FONT_TITLE)
+        axes[i].tick_params(axis='y', labelsize=23)
 
     # Save the entire figure
     plt.tight_layout()
