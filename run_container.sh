@@ -9,5 +9,4 @@ else
     TARGET_PATH="$1"
 fi
 
-# Run the singularity build command
-singularity build --fakeroot --sandbox "$TARGET_PATH" singularity.def
+singularity shell -B ./:/meta_opt_model --pwd /meta_opt_model "$TARGET_PATH"/

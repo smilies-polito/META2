@@ -7,9 +7,3 @@ class BaseSolver:
 
     def solve(self) -> float:
         pass
-
-    def get_name(self) -> str:
-        pass
-    
-    def get_variants():
-        pass

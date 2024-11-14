@@ -134,7 +134,7 @@ def get_fla(args):
     #result in a massive waste of time. If exceptions are raised more than once, most likely it's not flacco's fault.
     for i in range(5):
         try:
-            return FLA.get_FLA_measures(f, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=config["NON_DETERMINISTIC"])
+            return FLA.get_FLA_measures(f, config["FLA_PARAMS"]["random_sample_N"], config["FLA_PARAMS"]["FEM_params"], config["FLA_PARAMS"]["jensens_inequality_N"], NON_DETERMINISTIC=False)
         except Exception as e :
             if i==9:
                 raise e 

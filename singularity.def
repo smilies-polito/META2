@@ -3,7 +3,7 @@ From: ubuntu
 
 
 %files
-    train/requirements.txt requirements.txt
+    src/requirements.txt requirements.txt
 
 %post
     export TZ=America/Los_Angeles

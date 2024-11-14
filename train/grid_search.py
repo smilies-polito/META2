@@ -7,6 +7,7 @@ import pickle
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.ticker import FormatStrFormatter
 
 def build_dataset(scores, fla_measures):
     #fla: [fla_measures for f in functions]
@@ -74,7 +75,7 @@ def plot_heatmap(X,Y, grid, title, save_path, xLabel, yLabel,aspect="auto", vmin
     plt.yticks(ticks=np.arange(len(Y)), labels=Y, fontsize=24)
     # Add color bar for error values
     cbar = plt.colorbar(heatmap)
-    #cbar.set_label("Error",fontsize=18)
+    cbar.ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
     cbar.ax.tick_params(labelsize=22)
     for i in range(len(Y)):
         for j in range(len(X)):
