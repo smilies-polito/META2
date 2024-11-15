@@ -8,6 +8,7 @@ import copy
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.ticker import FormatStrFormatter
+from matplotlib.colors import LogNorm
 
 def build_dataset(scores, fla_measures):
     #fla: [fla_measures for f in functions]
@@ -66,8 +67,12 @@ def plot_heatmap(X,Y, grid, title, save_path, xLabel, yLabel,aspect="auto", vmin
     # Example data (replace with your actual data)
     grid = np.array(grid)
     plt.figure(figsize=(15.3, 9))
-    heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect)
-    #heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect,vmin=vmin, vmax=vmax)
+    #heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect)
+    """vmin, vmax = np.min(grid), np.max(grid)
+    limit = 0.005
+    if vmax-vmin < limit:
+        vmax = vmin + limit"""
+    heatmap = plt.imshow(grid, cmap="viridis", aspect=aspect,norm=LogNorm(vmin=vmin, vmax=vmax))
     # Set axis labels
     plt.xlabel(xLabel,fontsize=32)
     plt.ylabel(yLabel,fontsize=32)

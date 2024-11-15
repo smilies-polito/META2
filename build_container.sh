@@ -10,4 +10,4 @@ else
 fi
 
 # Run the singularity build command
-singularity build --fakeroot --sandbox "$TARGET_PATH" singularity.def
+singularity build --fakeroot "$TARGET_PATH" singularity.def

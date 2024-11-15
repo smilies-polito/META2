@@ -1,4 +1,4 @@
 **/__pycache__/
-train/dataset/*
-!train/dataset/base_config.json
-train/report.log
+src/dataset/*
+!src/dataset/base_config.json
+src/report.log

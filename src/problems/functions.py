@@ -69,9 +69,7 @@ def get_base_functions():
 
 def get_function_test(seed):
     def clean_string(input_string):
-        # Remove spaces, underscores, and symbols, keep only alphanumeric characters
         cleaned_string = re.sub(r'[^a-zA-Z0-9]', '', input_string)
-        # Convert to lowercase
         return cleaned_string.lower()
     def is_included(string1, string2):
         return string1 in string2 or string2 in string1
@@ -97,19 +95,16 @@ def get_function_test(seed):
                 )
         return sets 
             
-    def get_split(seed):
-        f = split_functions_in_disjointed_sets()
-        s1, s2 = [], []
-        random.seed(seed)
-        random.shuffle(f)
-        for c in f:
-            if len(s2)>(len(s1)+len(s2))*0.17:
-                s1 += c[1]
-            else:
-                s2 += c[1]
-        return s1, s2
-
-    s1, s2 = get_split(seed)
+            
+    f = split_functions_in_disjointed_sets()
+    s1, s2 = [], []
+    random.seed(seed)
+    random.shuffle(f)
+    for c in f:
+        if len(s2)>(len(s1)+len(s2))*0.17:
+            s1 += c[1]
+        else:
+            s2 += c[1]
     n1, n2 = [f[1] for f in s1], [f[1] for f in s2]
     s1 = [problem[0] for problem in s1]
     s2 = [problem[0] for problem in s2]

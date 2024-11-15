@@ -287,7 +287,7 @@ class FLA:
         #Activate r2py
         if not FLA.r2py_active:
             numpy2ri.activate()
-            r.source('fla/flacco_FLA.r')
+            r.source(os.path.join(os.path.dirname(os.path.abspath(__file__)),'flacco_FLA.r'))
             r2py_active = True
         #Generate dataset
         sampled_points = problem.sample_uniform(sample_size)

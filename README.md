@@ -77,7 +77,6 @@ Before running the training process, it is possible to modify the configuration 
 This command builds the model with the *train-and-test* split and produces a set of metrics measuring the quality of the model.
 ```
 cd src
-make dataset/<VERSION_NAME>/test_results/
 make dataset/<VERSION_NAME>/test_results/plots
 ```
 Running this command results in a set of intermediate files being produced:
@@ -97,6 +96,35 @@ As in the testing phase, a number of intermediate files are produced:
 * *train_scores.pickle*: normalized performance scores obtained from *train_scores_raw.pickle*.
 * *fla_train.pickle*: FLA features extracted from the functions in *train_functions.pickle*.
 
+## Running META²
+A META² class is provided to interactively use the built model.This step requires having built a model, in the form `src/dataset/<VERSION_NAME>/model.pickle`.
+
+1) Wrap your custom problem in a class following the BaseProblem interface, provided in `src/problems/BaseProblem.py`
+2) Import the META2 class and create an instance providing the version name: `meta2 = META2("<VERSION_NAME>")`
+3) Run `meta2.predict(problem_instance)`
+
+### Example
+```
+#Import META2 and the BaseProblem wrapper
+from src.META2 import META2
+from src.problems.BaseProblem import BaseProblem
+
+#Define your problem by extending BaseProblem
+class MyProblemWrapper(BaseProblem):
+    def __init__(self):
+        self.name = "My Example Function"
+        #Example function has 3 independent variables
+        self.dimensions = 3
+        #with ranges in [-1,1]
+        self.ranges = [[-1,1]]*3
+    #Implement the fitness function
+    def get_value(self, point: np.ndarray) -> float:
+        return np.sum(point) 
+
+#Create instance of META2:
+meta2 = META2("VERSION_1") #replace with <YOUR_VERSION_NAME>
+predictions = meta2.predict(MyProblemWrapper())
+```
 
 ## Extending META²
 This section provides instructions on how to extend the components of the META² framework.

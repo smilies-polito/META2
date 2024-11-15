@@ -31,19 +31,18 @@ dataset/%/fla_test.pickle: | dataset/%/test_functions.pickle
 	python3 train.py makeflatest $*
 
 #Train and test
-dataset/%/test_results/: dataset/%/fla_test.pickle dataset/%/test_scores.pickle
-	mkdir dataset/$*/test_results/
+dataset/%/test_results/predictions.pickle: | dataset/%/fla_test.pickle dataset/%/test_scores.pickle
+	mkdir -p dataset/$*/test_results/
 	python3 train.py trainandtest $* > dataset/$*/test_results/logs.txt
-#python3 train.py ploterror $* 
-dataset/%/test_results/plots: dataset/%/test_results/predictions.pickle
+
+dataset/%/test_results/plots: | dataset/%/test_results/predictions.pickle
 	python3 train.py ploterror $* 
 %/clean_results: dataset/%/test_results/
 	rm -rf dataset/$*/test_results/
 
 #Build model
-dataset/%/model.pickle: dataset/%/fla.pickle dataset/%/train_scores.pickle
+dataset/%/model.pickle: | dataset/%/fla.pickle dataset/%/train_scores.pickle
 	python3 train.py buildmodel $* 
 
 
-#> dataset/$*/test_logs.txt
-
+.SECONDARY:

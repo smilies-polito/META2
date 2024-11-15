@@ -1,15 +1,3 @@
-
-"""
-    Training steps:
-        1-Load configuration - includes directory for outputs
-        2-Define set of training functions - export with pickle
-        3-Produce scores for pairs (function, algorithm)
-        4-Produce FLA measures for functions
-        5-Train and export model
-    Validation steps:
-        >As training, but defining training functions require splitting original functions into two sets
-        and perform data augmentation separately
-"""
 import argparse
 import json 
 import os
@@ -200,7 +188,7 @@ def build_model(experiment_name):
     with open(f"{path}/train_scores.pickle", "rb") as f:
         scores = pickle.load(f)
     X, y = build_dataset(scores, fla)
-    model = RandomForest_Model(min_samples_split=4,n_estimators=110,max_features=200,convert_dtype=True)
+    model = RandomForest_Model(min_samples_split=3,n_estimators=120,max_features=200,convert_dtype=True)
     _ = model.train(X, y)
     model.export_model(f"{path}/model.pickle")
 
