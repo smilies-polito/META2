@@ -1,27 +1,27 @@
 # META² - Meta-heuristics meta-modeling
 <img src=".images/META2.png" alt="logo" width="600"/>
-<img src="https://github.com/smilies-polito/META2/blob/main/.images/META2.png" alt="logo" width="600"/>
 
 META² is a meta-model designed to predict performances of meta-heuristics on arbitrary optimization problems.
 
 This readme provides instructions to build, use and extend the model.
 
-## Building META²
-This section presents the instructions to define and build versions of the META² model.
+## Overview
+This README presents the instructions to define, build and run versions of the META² model, as well as to modify the key components of the model.
 
-Building a version of the model involves the creation of the training set - which entails defining a set of functions and computing the performance scores and the FLA features on them - and the training of the regression model.
+The build process involves the creation of the training set - defining a set of functions and computing the performance scores and the FLA features on them - and the training of the regression model.
 
-Building a version of the model can be done in the **test** mode, which uses a *train-and-test* split to evaluate the model's performances, and **train** mode, which uses the entire dataset to train the model.
+Building a version of the model can be done in  **test** mode, which uses a *train-and-test* split to evaluate the model's performances, and **train** mode, which uses the entire dataset to train a runnable instance of the model.
 
-Due to the way data augmentation is applied to the set of functions, and the need to produce disjointed sets for the *train-and-test* split, the datasets built in one of the two modes cannot be re-used for the other.
-
+Due to the way data augmentation is applied to the set of functions, and the need to produce disjointed sets for the *train-and-test* split, the datasets built for one of the two modes cannot be re-used for the other.
 
 The first step is to clone the META² repository:
 ```
 git clone https://gitlabtsgroup.polito.it/saisei/META2.git
 ```
 
-### Build the environment with Singularity
+## Setup the environment
+In order to build and run the model, an environment must be setup. This section provides instruction to either build a Singularity container with the environment ready, or to setup it manually in a Linux environment.
+### Setup the environment with Singularity
 The simplest and recommended way to set-up the environment to run the META² model is to use the provided Singularity Definition file to build the environment in a container.
 1) Install `Singularity` from https://docs.sylabs.io/guides/3.0/user-guide/installation.html:
 	* Install `Singularity` release 3.10.2, with `Go` version 1.18.4
@@ -32,26 +32,26 @@ The simplest and recommended way to set-up the environment to run the META² mod
     cd META2
     sh build_container.sh <PATH_TO_CONTAINER>
     ```
-    If <PATH_TO_CONTAINER> is not provided, by default the container is created in the parent directory of the repository and named "META2".
+    If <PATH_TO_CONTAINER> is not provided, by default the container is created in the parent directory of the repository and named "META2.sif".
 
 3) Open a shell inside the container:
     ```
     sh run_container.sh <PATH_TO_CONTAINER>
     ```
-    As in step 2, <PATH_TO_CONTAINER>, if not provided, defaults to "../META2".
+    As in step 2, <PATH_TO_CONTAINER>, if not provided, defaults to "../META2.sif".
 
-### Build the environment with a python virtual-env
+### Setup the environment with a python virtual-env
 In a Linux machine it is possible to set-up the environment manually.
-* Make sure Python3, Pip, python3-setuptools and the Make utility are installed.
+* Make sure Python3, Pip, python3-setuptools, R and the Make utility are installed.
 * Enter the repository directory: `cd META2`
 * (Optional) create a virtual environment: `python -m venv env`
 * (Optional) activate the virtual environment: `env/bin/activate`
 * Install requirements: `pip install -r requirements.txt`
 
-### Train META²
+## Train META²
 With a shell opened inside the Singularity container, or with the environment manually configured, it is possible to build new versions of the META² framework:
 
-#### Create version and configuration
+### Create version and configuration
 The first step is to create a _version_ of the model. A _version_ is defined by its own configuration and its path. The creation of versions is managed by the _makefile_ in the _src_ directory:
 ```
 cd src
@@ -73,18 +73,20 @@ Before running the training process, it is possible to modify the configuration 
         * **random_walks**: each object represent a random walk taken on the target functions and used to compute a FEM measure. The *random_walk_len* specifies the number of function evaluations required, the *step_size* influence the local-vs-global nature of the measure taken.
         * **repeat_random_walk**: each random walk in *random_walks* is repeated N. times.
 
-#### Train and test the model
+### Train and test the model
 This command builds the model with the *train-and-test* split and produces a set of metrics measuring the quality of the model.
 ```
 cd src
 make dataset/<VERSION_NAME>/test_results/plots
 ```
-Running this command results in a set of intermediate files being produced:
+This rule produces a directory `dataset/<VERSION_NAME>/test_results` containing a log file, with the MSE of the regression model, a *pickle* file containing the raw predictions and a set of plots representing the quality of the model's predictions.
+
+The rule also produces of intermediate files:
 * *test_functions.pickle*: contains two sets of functions, used respectively to build the training and testing set.
 * *test_scores_raw.pickle*: raw fitness scores produced by optimizing each function in *test_functions.pickle* with each meta-heuristics *REPEAT_BENCHMARK* times.
 * *test_scores.pickle*: normalized performance scores obtained from *test_scores_raw.pickle*.
 * *fla_test.pickle*: FLA features extracted from the functions in *test_functions.pickle*.
-#### Train and build the model on the full dataset
+### Train and build the model on the full dataset
 This command builds the dataset and use it entirely to train the model, which is expored as a *pickle* file.
 ```
 cd src
@@ -96,8 +98,8 @@ As in the testing phase, a number of intermediate files are produced:
 * *train_scores.pickle*: normalized performance scores obtained from *train_scores_raw.pickle*.
 * *fla_train.pickle*: FLA features extracted from the functions in *train_functions.pickle*.
 
-## Running META²
-A META² class is provided to interactively use the built model.This step requires having built a model, in the form `src/dataset/<VERSION_NAME>/model.pickle`.
+## Run META²
+A META² class is provided to interactively use the built model. This step requires a built model version, in the form `src/dataset/<VERSION_NAME>/model.pickle`.
 
 1) Wrap your custom problem in a class following the BaseProblem interface, provided in `src/problems/BaseProblem.py`
 2) Import the META2 class and create an instance providing the version name: `meta2 = META2("<VERSION_NAME>")`
@@ -105,6 +107,7 @@ A META² class is provided to interactively use the built model.This step requir
 
 ### Example
 ```
+import numpy as np
 #Import META2 and the BaseProblem wrapper
 from src.META2 import META2
 from src.problems.BaseProblem import BaseProblem
@@ -122,11 +125,12 @@ class MyProblemWrapper(BaseProblem):
         return np.sum(point) 
 
 #Create instance of META2:
-meta2 = META2("VERSION_1") #replace with <YOUR_VERSION_NAME>
+meta2 = META2("VERSION_1") #replace with <VERSION_NAME>
+#Predict performances
 predictions = meta2.predict(MyProblemWrapper())
 ```
 
-## Extending META²
+## Extend META²
 This section provides instructions on how to extend the components of the META² framework.
 
 ### Extending the function set F

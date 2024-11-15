@@ -3,7 +3,7 @@
 # Check if a command-line argument is provided
 if [ -z "$1" ]; then
     # No argument provided, use default path
-    TARGET_PATH="../META2"
+    TARGET_PATH="../META2.sif"
 else
     # Use the provided argument as the target path
     TARGET_PATH="$1"
